@@ -1,13 +1,13 @@
-FROM alpine as build
+FROM golang:alpine as build
 
 RUN \
 	apk add --no-cache go build-base git  && \
-	git clone https://github.com/carlosedp/apcupsd-exporter && \
-	cd apcupsd-exporter && \
-	make linux/amd64
+	git clone https://github.com/mdlayher/apcupsd_exporter && \
+	cd apcupsd_exporter && \
+	go build cmd/apcupsd_exporter/main.go
 
 FROM alpine
-COPY --from=build /apcupsd-exporter/apcupsd-exporter-linux-amd64 /sbin/apcupsd-exporter
+COPY --from=build /go/apcupsd_exporter/main /sbin/apcupsd_exporter
 EXPOSE ${LISTENADDR}
 
-ENTRYPOINT ["/sbin/apcupsd-exporter"]
+ENTRYPOINT ["/sbin/apcupsd_exporter"]
